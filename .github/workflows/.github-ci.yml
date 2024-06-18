@@ -11,8 +11,8 @@ on:
 jobs:
   backend:
     name: Back-end
-    uses: ./ops/github/pipelines/.github-ci.back.yml
+    uses: ./.github/workflows/.github-ci.back.yml
 
   frontend:
     name: Front-end
-    uses: ./ops/github/pipelines/.github-ci.front.yml
+    uses: ./.github/workflows/.github-ci.front.yml

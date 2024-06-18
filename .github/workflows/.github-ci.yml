@@ -1,13 +1,18 @@
-stages:
-  - build
-  - test
-  # - deploy
+name: CI
 
-cache:
-  paths:
-    - front_student/node_modules
-    - back_student/node_modules
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
-include:
-  - "/ops/gitlab/pipelines/.github-ci.back.yml"
-  - "/ops/gitlab/pipelines/.github-ci.front.yml"
+jobs:
+  backend:
+    name: Back-end
+    uses: ./ops/github/pipelines/.github-ci.back.yml
+
+  frontend:
+    name: Front-end
+    uses: ./ops/github/pipelines/.github-ci.front.yml

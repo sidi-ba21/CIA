@@ -26,7 +26,7 @@ jobs:
       run: |
         docker build -t front-end:latest -f front_student/Dockerfile .
 
-test:
+  test:
     name: Test
     runs-on: ubuntu-latest
     needs: build

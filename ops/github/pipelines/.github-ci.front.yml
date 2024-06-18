@@ -1,0 +1,21 @@
+front_build:
+  stage: build
+  image: mhart/alpine-node:12
+  script:
+    - cd front_student
+    - yarn install
+    - yarn build
+
+  artifacts:
+    paths:
+      - front_student/node_modules
+      - front_student/build
+
+front_test:
+  stage: test
+  image: mhart/alpine-node:12
+  dependencies:
+    - front_build
+  script:
+    - cd front_student
+    - yarn test

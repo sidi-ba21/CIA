@@ -1,0 +1,20 @@
+back_build:
+  stage: build
+  image: node:11-alpine
+  script:
+    - cd back_student
+    - yarn install
+    - yarn run prod
+
+  artifacts:
+    paths:
+      - back_student/node_modules
+
+back_test:
+  stage: test
+  image: node:11-alpine
+  dependencies:
+    - back_build
+  script:
+    - cd back_student
+    - yarn test

@@ -45,3 +45,51 @@ jobs:
 
     - name: Scan frontend image with Trivy
       run: trivy image my-frontend-image:latest
+    - name: Install Trivy
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget
+        wget https://github.com/aquasecurity/trivy/releases/download/v0.22.0/trivy_0.22.0_Linux-64bit.deb
+        sudo dpkg -i trivy_0.22.0_Linux-64bit.deb
+
+    - name: Scan backend image with Trivy and export report
+      run: trivy image -f json -o trivy-backend-report.json my-backend-image:latest
+
+    - name: Scan frontend image with Trivy and export report
+      run: trivy image -f json -o trivy-frontend-report.json my-frontend-image:latest
+
+    - name: Upload Trivy reports as artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: trivy-reports
+        path: |
+          trivy-backend-report.json
+          trivy-frontend-report.json
+
+    - name: Check for critical vulnerabilities in backend report
+      id: check_backend
+      run: |
+        if grep -q '"Critical"' trivy-backend-report.json; then
+          echo "critical_found=true" >> $GITHUB_ENV
+        else
+          echo "critical_found=false" >> $GITHUB_ENV
+        fi
+
+    - name: Check for critical vulnerabilities in frontend report
+      id: check_frontend
+      run: |
+        if grep -q '"Critical"' trivy-frontend-report.json; then
+          echo "critical_found=true" >> $GITHUB_ENV
+        else
+          echo "critical_found=false" >> $GITHUB_ENV
+        fi
+
+    - name: Decide deployment
+      run: |
+        if [ "$critical_found" == "true" ]; then
+          echo "don't deploy critical vulnerabilities detected"
+        else
+          echo "you can deploy safely"
+        fi
+      env:
+        critical_found: ${{ env.critical_found }}

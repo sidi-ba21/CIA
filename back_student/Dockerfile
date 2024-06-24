@@ -1,8 +1,8 @@
 FROM node:11-alpine
 
-RUN mkdir -p /usr/src/app
+RUN mkdir -p /usr/src/app/back
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/back
 
 COPY . .
 

@@ -3,6 +3,7 @@ WORKDIR /app
 COPY . .
 RUN yarn install
 RUN yarn build
-WORKDIR /app
-COPY --from=builder /app/build .
-CMD ["serve", "-p", "80", "-s", "."]
+# RUN ls -lR
+
+FROM nginx
+COPY --from=builder /app/build /usr/share/nginx/html

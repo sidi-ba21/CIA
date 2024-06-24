@@ -9,6 +9,8 @@ services:
     environment: # env variables, you usually set this to override existing ones
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: dev_db
+      # MYSQL_USER: root
+      # MYSQL_PASSWORD: root
     ports:
       - "3306:3306"
     networks:

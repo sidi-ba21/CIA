@@ -69,7 +69,7 @@ jobs:
     - name: Check for critical vulnerabilities in backend report
       id: check_backend
       run: |
-        if grep -q '"Critical"' trivy-backend-report.txt; then
+        if grep -q '"CRITICAL"' trivy-backend-report.txt; then
           echo "critical_found=true" >> $GITHUB_ENV
         else
           echo "critical_found=false" >> $GITHUB_ENV
@@ -78,7 +78,7 @@ jobs:
     - name: Check for critical vulnerabilities in frontend report
       id: check_frontend
       run: |
-        if grep -q '"Critical"' trivy-frontend-report.txt; then
+        if grep -q '"CRITICAL"' trivy-frontend-report.txt; then
           echo "critical_found=true" >> $GITHUB_ENV
         else
           echo "critical_found=false" >> $GITHUB_ENV

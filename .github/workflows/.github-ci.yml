@@ -53,23 +53,23 @@ jobs:
         sudo dpkg -i trivy_0.22.0_Linux-64bit.deb
 
     - name: Scan backend image with Trivy and export report
-      run: trivy image -f json -o trivy-backend-report.json my-backend-image:latest
+      run: trivy image -o trivy-backend-report.txt my-backend-image:latest
 
     - name: Scan frontend image with Trivy and export report
-      run: trivy image -f json -o trivy-frontend-report.json my-frontend-image:latest
+      run: trivy image -o trivy-frontend-report.txt my-frontend-image:latest
 
     - name: Upload Trivy reports as artifacts
       uses: actions/upload-artifact@v3
       with:
         name: trivy-reports
         path: |
-          trivy-backend-report.json
-          trivy-frontend-report.json
+          trivy-backend-report.txt
+          trivy-frontend-report.txt
 
     - name: Check for critical vulnerabilities in backend report
       id: check_backend
       run: |
-        if grep -q '"Critical"' trivy-backend-report.json; then
+        if grep -q '"Critical"' trivy-backend-report.txt; then
           echo "critical_found=true" >> $GITHUB_ENV
         else
           echo "critical_found=false" >> $GITHUB_ENV
@@ -78,7 +78,7 @@ jobs:
     - name: Check for critical vulnerabilities in frontend report
       id: check_frontend
       run: |
-        if grep -q '"Critical"' trivy-frontend-report.json; then
+        if grep -q '"Critical"' trivy-frontend-report.txt; then
           echo "critical_found=true" >> $GITHUB_ENV
         else
           echo "critical_found=false" >> $GITHUB_ENV

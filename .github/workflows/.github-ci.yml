@@ -101,6 +101,7 @@ jobs:
           echo "critical_found_frontend=true" >> $GITHUB_ENV
         else
           echo "critical_found_frontend=false" >> $GITHUB_ENV
+        fi
 
   deploy:
     runs-on: ubuntu-latest

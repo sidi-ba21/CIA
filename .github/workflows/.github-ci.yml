@@ -33,10 +33,18 @@ jobs:
     - name: Build frontend image
       run: docker build -t my-frontend-image:latest -f front_student/Dockerfile .
 
-    - name: Save Docker image digest
+    - name: Save Docker images to files
       run: |
-        echo "BACKEND_DIGEST=$(docker inspect --format='{{index .Id}}' my-backend-image:latest)" >> $GITHUB_ENV
-        echo "FRONTEND_DIGEST=$(docker inspect --format='{{index .Id}}' my-frontend-image:latest)" >> $GITHUB_ENV
+        docker save my-backend-image:latest -o my-backend-image.tar
+        docker save my-frontend-image:latest -o my-frontend-image.tar
+
+    - name: Upload Docker images as artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: docker-images
+        path: |
+          my-backend-image.tar
+          my-frontend-image.tar
 
   scan:
     runs-on: ubuntu-latest
@@ -46,17 +54,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Download Docker images
+      uses: actions/download-artifact@v2
+      with:
+        name: docker-images
+
+    - name: Load Docker images from files
+      run: |
+        docker load -i my-backend-image.tar
+        docker load -i my-frontend-image.tar
+
     - name: Install Trivy
       run: |
         sudo apt-get update
         sudo apt-get install -y wget
         wget https://github.com/aquasecurity/trivy/releases/download/v0.22.0/trivy_0.22.0_Linux-64bit.deb
         sudo dpkg -i trivy_0.22.0_Linux-64bit.deb
-
-    - name: Load Docker images
-      run: |
-        docker pull my-backend-image:latest
-        docker pull my-frontend-image:latest
 
     - name: Scan backend image with Trivy and save report
       run: trivy image -o trivy-backend-report.txt my-backend-image:latest

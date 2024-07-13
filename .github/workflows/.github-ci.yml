@@ -11,7 +11,7 @@ on:
 jobs:
   sonarqube:
     runs-on: self-hosted
-    needs: build
+    # needs: build
 
     steps:
     - name: Checkout code
@@ -52,42 +52,42 @@ jobs:
         sonar-scanner \
           -Dsonar.login=$SONAR_TOKEN
 
-  build:
-    runs-on: self-hosted
+  # build:
+  #   runs-on: self-hosted
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+  #   - name: Set up Docker Buildx
+  #     uses: docker/setup-buildx-action@v1
 
-    - name: Cache Docker layers
-      uses: actions/cache@v2
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-
+  #   - name: Cache Docker layers
+  #     uses: actions/cache@v2
+  #     with:
+  #       path: /tmp/.buildx-cache
+  #       key: ${{ runner.os }}-buildx-${{ github.sha }}
+  #       restore-keys: |
+  #         ${{ runner.os }}-buildx-
 
-    - name: Build backend image
-      run: docker build -t my-backend-image:latest -f back_student/Dockerfile .
+  #   - name: Build backend image
+  #     run: docker build -t my-backend-image:latest -f back_student/Dockerfile .
 
-    - name: Build frontend image
-      run: docker build -t my-frontend-image:latest -f front_student/Dockerfile .
+  #   - name: Build frontend image
+  #     run: docker build -t my-frontend-image:latest -f front_student/Dockerfile .
 
-    - name: Save Docker images to files
-      run: |
-        docker save my-backend-image:latest -o my-backend-image.tar
-        docker save my-frontend-image:latest -o my-frontend-image.tar
+  #   - name: Save Docker images to files
+  #     run: |
+  #       docker save my-backend-image:latest -o my-backend-image.tar
+  #       docker save my-frontend-image:latest -o my-frontend-image.tar
 
-    - name: Upload Docker images as artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: docker-images
-        path: |
-          my-backend-image.tar
-          my-frontend-image.tar
+  #   - name: Upload Docker images as artifacts
+  #     uses: actions/upload-artifact@v3
+  #     with:
+  #       name: docker-images
+  #       path: |
+  #         my-backend-image.tar
+  #         my-frontend-image.tar
 
   # scan:
   #   runs-on: ubuntu-latest

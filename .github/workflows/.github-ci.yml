@@ -36,15 +36,22 @@ jobs:
         unzip sonar-scanner-cli-4.6.2.2472-linux.zip -d $HOME
         export PATH="$HOME/sonar-scanner-4.6.2.2472-linux/bin:$PATH"
 
-    - name: Run SonarQube Scan
+    - name: Run SonarQube Scan for Backend
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
+        cd back_student
         sonar-scanner \
-          -Dsonar.projectKey=sidi-ba21_CIA_4aa70565-e3df-4073-96ff-772b9797f4f7 \
-          -Dsonar.sources=. \
-          -Dsonar.host.url=http://localhost:9000 \
           -Dsonar.login=$SONAR_TOKEN
+
+    - name: Run SonarQube Scan for Frontend
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        cd ../front_student
+        sonar-scanner \
+          -Dsonar.login=$SONAR_TOKEN
+
   build:
     runs-on: self-hosted
 

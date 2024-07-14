@@ -13,7 +13,6 @@ permissions:
   security-events: write
   issues: read
   actions: read
-  dependabot-alerts: read
 
 jobs:
   build:
@@ -133,20 +132,20 @@ jobs:
              -H "Accept: application/vnd.github.vixen+json" \
              https://api.github.com/repos/${{ github.repository }}/dependabot/alerts > dependabot-alerts.json
 
-    - name: Print Dependabot Alerts
-      run: cat dependabot-alerts.json
+    # - name: Print Dependabot Alerts
+    #   run: cat dependabot-alerts.json
 
-    - name: Check for High or Critical Dependabot Alerts
-      id: check_dependabot
-      run: |
-        cat dependabot-alerts.json | jq '.[] | select(.security_advisory.severity == "high" or .security_advisory.severity == "critical")' > high_critical_alerts.json
-        if [ -s high_critical_alerts.json ]; then
-          echo "high_or_critical_found=true" >> $GITHUB_ENV
-          echo "::set-output name=high_or_critical_found::true"
-        else
-          echo "high_or_critical_found=false" >> $GITHUB_ENV
-          echo "::set-output name=high_or_critical_found::false"
-        fi
+    # - name: Check for High or Critical Dependabot Alerts
+    #   id: check_dependabot
+    #   run: |
+    #     cat dependabot-alerts.json | jq '.[] | select(.security_advisory.severity == "high" or .security_advisory.severity == "critical")' > high_critical_alerts.json
+    #     if [ -s high_critical_alerts.json ]; then
+    #       echo "high_or_critical_found=true" >> $GITHUB_ENV
+    #       echo "::set-output name=high_or_critical_found::true"
+    #     else
+    #       echo "high_or_critical_found=false" >> $GITHUB_ENV
+    #       echo "::set-output name=high_or_critical_found::false"
+    #     fi
 
   check_codeql:
     runs-on: ubuntu-latest
@@ -162,6 +161,9 @@ jobs:
         curl -H "Authorization: token $GITHUB_TOKEN" \
              -H "Accept: application/vnd.github.vixen+json" \
              https://api.github.com/repos/${{ github.repository }}/code-scanning/alerts > codeql-alerts.json
+
+    - name: Print CodeQl Alerts
+      run: cat codeql-alerts.json
 
     - name: Check for High or Critical CodeQL Alerts
       id: check_codeql

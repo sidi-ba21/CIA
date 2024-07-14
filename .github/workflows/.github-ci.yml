@@ -11,7 +11,7 @@ on:
 permissions:
   contents: read
   security-events: write
-  issues: read  # Ensure issues permission is set for Dependabot alerts
+  issues: read
   actions: read
 
 jobs:
@@ -117,7 +117,7 @@ jobs:
           echo "::set-output name=critical_found_frontend::false"
         fi
 
-   check_dependabot:
+  check_dependabot:
     runs-on: ubuntu-latest
 
     steps:

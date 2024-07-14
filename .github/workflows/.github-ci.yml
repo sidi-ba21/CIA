@@ -111,9 +111,54 @@ jobs:
           echo "::set-output name=critical_found_frontend::false"
         fi
 
+  dependabot_alerts:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Fetch Dependabot Alerts
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        curl -H "Authorization: token $GITHUB_TOKEN" \
+             -H "Accept: application/vnd.github.vixen+json" \
+             https://api.github.com/repos/${{ github.repository }}/dependabot/alerts > dependabot-alerts.json
+
+    - name: Check for High or Critical Dependabot Alerts
+      id: check_dependabot
+      run: |
+        cat dependabot-alerts.json | jq '.[] | select(.security_advisory.severity == "high" or .security_advisory.severity == "critical")' > high_critical_alerts.json
+        if [ -s high_critical_alerts.json ]; then
+          echo "high_or_critical_found=true" >> $GITHUB_ENV
+          echo "::set-output name=high_or_critical_found::true"
+        else
+          echo "high_or_critical_found=false" >> $GITHUB_ENV
+          echo "::set-output name=high_or_critical_found::false"
+        fi
+
+  codeql:
+    name: "CodeQL"
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: javascript
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "security"
+
   deploy:
     runs-on: ubuntu-latest
-    needs: scan
+    needs: [scan, dependabot_alerts, codeql]
 
     steps:
     - name: Checkout code
@@ -121,7 +166,7 @@ jobs:
 
     - name: Decide deployment
       run: |
-        if [ "${{ needs.scan.outputs.critical_found_backend }}" == "true" ] || [ "${{ needs.scan.outputs.critical_found_frontend }}" == "true" ]; then
+        if [ "${{ needs.scan.outputs.critical_found_backend }}" == "true" ] || [ "${{ needs.scan.outputs.critical_found_frontend }}" == "true" ] || [ "${{ needs.dependabot_alerts.outputs.high_or_critical_found }}" == "true" ]; then
           echo "don't deploy critical vulnerabilities detected"
           exit 1
         else
